@@ -12,10 +12,8 @@ if ! uci -q get system.@imm_init[0].lang > "/dev/null"; then
 	EOF
 fi
 
-sed -i '/DISTRIB_REVISION/d' /etc/openwrt_release
-echo "DISTRIB_REVISION='R24.12.12'" >> /etc/openwrt_release
 sed -i '/DISTRIB_DESCRIPTION/d' /etc/openwrt_release
-echo "DISTRIB_DESCRIPTION='CyberHomeROS '" >> /etc/openwrt_release
+echo "DISTRIB_DESCRIPTION='CyberHomeROS V25.1.1 '" >> /etc/openwrt_release
 
 sed -i "/log-facility/d" "/etc/dnsmasq.conf"
 echo "log-facility=/dev/null" >> "/etc/dnsmasq.conf"
