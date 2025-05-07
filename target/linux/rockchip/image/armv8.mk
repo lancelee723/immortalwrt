@@ -50,7 +50,8 @@ define Device/cyber_cyber3588-aib
   SOC := rk3588
   BOOT_FLOW := pine64-img
   DEVICE_PACKAGES := kmod-ata-ahci-dwc kmod-r8125 kmod-mt7921e wpad-openssl \
-        kmod-usb-net-cdc-mbim kmod-usb-net-qmi-wwan kmod-usb-serial-option uqmi
+	kmod-hwmon-pwmfan kmod-usb-net-cdc-mbim kmod-usb-net-qmi-wwan \
+	kmod-usb-serial-option uqmi
 endef
 TARGET_DEVICES += cyber_cyber3588-aib
 
@@ -139,7 +140,7 @@ define Device/friendlyarm_nanopi-r3s
   DEVICE_MODEL := NanoPi R3S
   SOC := rk3566
   BOOT_FLOW := pine64-img
-  DEVICE_PACKAGES := kmod-r8168
+  DEVICE_PACKAGES := kmod-r8169
 endef
 TARGET_DEVICES += friendlyarm_nanopi-r3s
 
@@ -148,7 +149,7 @@ define Device/friendlyarm_nanopi-r4s
   DEVICE_MODEL := NanoPi R4S
   SOC := rk3399
   BOOT_FLOW := pine64-bin
-  DEVICE_PACKAGES := kmod-r8168
+  DEVICE_PACKAGES := kmod-r8169
 endef
 TARGET_DEVICES += friendlyarm_nanopi-r4s
 
@@ -157,7 +158,7 @@ define Device/friendlyarm_nanopi-r4se
   DEVICE_MODEL := NanoPi R4SE
   SOC := rk3399
   BOOT_FLOW := pine64-bin
-  DEVICE_PACKAGES := kmod-r8168
+  DEVICE_PACKAGES := kmod-r8169
 endef
 TARGET_DEVICES += friendlyarm_nanopi-r4se
 
@@ -167,7 +168,7 @@ define Device/friendlyarm_nanopi-r4s-enterprise
   SOC := rk3399
   UBOOT_DEVICE_NAME := nanopi-r4s-rk3399
   BOOT_FLOW := pine64-bin
-  DEVICE_PACKAGES := kmod-r8168
+  DEVICE_PACKAGES := kmod-r8169
 endef
 TARGET_DEVICES += friendlyarm_nanopi-r4s-enterprise
 
@@ -212,7 +213,7 @@ define Device/huake_guangmiao-g4c
   DEVICE_MODEL := GuangMiao G4C
   SOC := rk3399
   BOOT_FLOW := pine64-bin
-  DEVICE_PACKAGES := kmod-r8168
+  DEVICE_PACKAGES := kmod-r8169
 endef
 TARGET_DEVICES += huake_guangmiao-g4c
 
