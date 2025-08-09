@@ -979,21 +979,33 @@ define Device/compex_wpj563
 endef
 TARGET_DEVICES += compex_wpj563
 
-define Device/dell_apl26-0ae
+define Device/dell_apl2x
   SOC := qca9550
   DEVICE_VENDOR := Dell
   DEVICE_MODEL := SonicPoint
-  DEVICE_VARIANT := ACe (APL26-0AE)
   DEVICE_ALT0_VENDOR := SonicWall
   DEVICE_ALT0_MODEL := SonicPoint
-  DEVICE_ALT0_VARIANT := ACe (APL26-0AE)
   DEVICE_PACKAGES := ath10k-firmware-qca988x-ct kmod-ath10k-ct kmod-usb2
   KERNEL_SIZE := 5952k
   IMAGE_SIZE := 31680k
   IMAGE/sysupgrade.bin = append-kernel | pad-to $$$$(BLOCKSIZE) | \
 	append-rootfs | pad-rootfs | check-size | append-metadata
 endef
+
+define Device/dell_apl26-0ae
+  $(Device/dell_apl2x)
+  DEVICE_VARIANT := ACe (APL26-0AE)
+  DEVICE_ALT0_VARIANT := ACe (APL26-0AE)
+endef
 TARGET_DEVICES += dell_apl26-0ae
+
+define Device/dell_apl27-0b1
+  $(Device/dell_apl2x)
+  DEVICE_VARIANT := ACi (APL27-0B1)
+  DEVICE_ALT0_VARIANT := ACi (APL27-0B1)
+  DEVICE_PACKAGES += kmod-regulator-userspace-consumer
+endef
+TARGET_DEVICES += dell_apl27-0b1
 
 define Device/devolo_dlan-pro-1200plus-ac
   SOC := ar9344
@@ -1102,6 +1114,7 @@ define Device/dlink_dap-13xx
   IMAGES += factory.bin
   IMAGE/factory.bin := append-kernel | pad-to $$$$(BLOCKSIZE) | \
 	append-rootfs | pad-rootfs | check-size | mkdapimg2 0xE0000
+  DEFAULT := n
 endef
 
 define Device/dlink_dap-1330-a1
@@ -3441,6 +3454,7 @@ define Device/zyxel_nwa11xx
 	append-kernel | pad-to $$$$(BLOCKSIZE) | append-rootfs | \
 	pad-rootfs | pad-to 8192k | check-size | zyxel-tar-bz2 \
 	vmlinux_mi124_f1e mi124_f1e-jffs2 | append-md5sum-bin
+  DEFAULT := n
 endef
 
 define Device/zyxel_nwa1100-nh
