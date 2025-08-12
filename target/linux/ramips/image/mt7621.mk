@@ -314,6 +314,23 @@ define Device/ampedwireless_ally-00x19k
 endef
 TARGET_DEVICES += ampedwireless_ally-00x19k
 
+define Device/arcadyan_we410443
+  $(Device/dsa-migration)
+  $(Device/uimage-lzma-loader)
+  DEVICE_VENDOR := Arcadyan
+  DEVICE_MODEL := WE410443
+  IMAGE_SIZE := 32128k
+  KERNEL_SIZE := 4352k
+  KERNEL := kernel-bin | append-dtb | lzma | loader-kernel | \
+	uImage none | arcadyan-trx 0x746f435d
+  KERNEL_INITRAMFS := kernel-bin | append-dtb | lzma | loader-kernel | \
+	uImage none
+  IMAGE/sysupgrade.bin := append-kernel | pad-to $$$$(KERNEL_SIZE) | \
+	append-rootfs | pad-rootfs | check-size | append-metadata
+  DEVICE_PACKAGES := kmod-mt7615-firmware -uboot-envtools
+endef
+TARGET_DEVICES += arcadyan_we410443
+
 define Device/arcadyan_we420223-99
   $(Device/dsa-migration)
   $(Device/uimage-lzma-loader)
@@ -644,6 +661,18 @@ define Device/bolt_arion
   DEVICE_PACKAGES := kmod-mt7603 kmod-mt76x2
 endef
 TARGET_DEVICES += bolt_arion
+
+define Device/c-life_xg1
+  $(Device/nand)
+  DEVICE_VENDOR := C-Life
+  DEVICE_MODEL := XG1
+  DEVICE_PACKAGES := kmod-mt7915-firmware kmod-usb3 kmod-usb-audio
+  IMAGE_SIZE := 254720k
+  IMAGES += factory.bin
+  IMAGE/factory.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-ubi | \
+	check-size
+endef
+TARGET_DEVICES += c-life_xg1
 
 define Device/comfast_cf-e390ax
   $(Device/dsa-migration)
@@ -1396,10 +1425,10 @@ ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
   IMAGE/factory.bin := append-image-stage initramfs-kernel.bin | \
 	inteno-bootfs | inteno-y3-header EX400 | append-md5sum-ascii-salted
 endif
-  IMAGE/sysupgrade.bin := append-kernel | inteno-bootfs | \
+  IMAGE/sysupgrade.bin := append-kernel | inteno-bootfs | pad-to 10M | \
     sysupgrade-tar kernel=$$$$@ | check-size | append-metadata
   DEVICE_IMG_NAME = $$(DEVICE_IMG_PREFIX)-$$(2)
-  DEVICE_PACKAGES := kmod-mt7603 kmod-mt7615-firmware kmod-usb3
+  DEVICE_PACKAGES := kmod-mt7603 kmod-mt7615-firmware kmod-usb3 kmod-keyboard-sx951x kmod-button-hotplug
 endef
 
 define Device/genexis_pulse-ex400
@@ -2536,14 +2565,14 @@ endef
 TARGET_DEVICES += sim_simax1800t
 
 define Device/snr_snr-cpe-me1
-	$(Device/dsa-migration)
-	$(Device/uimage-lzma-loader)
-	IMAGE_SIZE := 15040k
-	DEVICE_VENDOR := SNR
-	DEVICE_MODEL := SNR-CPE-ME1
-	UIMAGE_NAME := SNR-CPE-ME1-5GHZ-MT
-	DEVICE_PACKAGES := kmod-mt7603 kmod-mt76x0e kmod-usb3 \
-		kmod-usb-ledtrig-usbport uboot-envtools
+  $(Device/dsa-migration)
+  $(Device/uimage-lzma-loader)
+  IMAGE_SIZE := 15040k
+  DEVICE_VENDOR := SNR
+  DEVICE_MODEL := SNR-CPE-ME1
+  UIMAGE_NAME := SNR-CPE-ME1-5GHZ-MT
+  DEVICE_PACKAGES := kmod-mt7603 kmod-mt76x0e kmod-usb3 \
+	kmod-usb-ledtrig-usbport
 endef
 TARGET_DEVICES += snr_snr-cpe-me1
 
@@ -2566,8 +2595,8 @@ define Device/snr_snr-cpe-me2-sfp
   DEVICE_VENDOR := SNR
   DEVICE_MODEL := SNR-CPE-ME2-SFP
   UIMAGE_NAME := $$(DEVICE_MODEL)
-  DEVICE_PACKAGES := kmod-mt7615-firmware kmod-usb3 \
-	    kmod-sfp kmod-usb-ledtrig-usbport uboot-envtools
+  DEVICE_PACKAGES := kmod-mt7615-firmware kmod-usb3 kmod-sfp \
+	kmod-usb-ledtrig-usbport
 endef
 TARGET_DEVICES += snr_snr-cpe-me2-sfp
 
@@ -3146,8 +3175,7 @@ define Device/xiaomi_mi-router-3g
   $(Device/xiaomi_nand_separate)
   DEVICE_MODEL := Mi Router 3G
   IMAGE_SIZE := 124416k
-  DEVICE_PACKAGES += kmod-mt7603 kmod-mt76x2 kmod-usb3 \
-	kmod-usb-ledtrig-usbport -uboot-envtools
+  DEVICE_PACKAGES += kmod-mt7603 kmod-mt76x2 kmod-usb3 kmod-usb-ledtrig-usbport
   SUPPORTED_DEVICES += R3G mir3g xiaomi,mir3g
 endef
 TARGET_DEVICES += xiaomi_mi-router-3g
@@ -3213,7 +3241,7 @@ define Device/xiaomi_mi-router-ac2100
   $(Device/xiaomi_nand_separate)
   DEVICE_MODEL := Mi Router AC2100
   IMAGE_SIZE := 120320k
-  DEVICE_PACKAGES += kmod-mt7603 kmod-mt7615-firmware -uboot-envtools
+  DEVICE_PACKAGES += kmod-mt7603 kmod-mt7615-firmware
 endef
 TARGET_DEVICES += xiaomi_mi-router-ac2100
 
