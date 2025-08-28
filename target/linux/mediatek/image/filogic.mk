@@ -629,7 +629,7 @@ define Device/cmcc_rax3000m_common
   IMAGE/sysupgrade.itb := append-kernel | \
 	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | \
 	pad-rootfs | append-metadata
-  ARTIFACTS := emmc-gpt.bin emmc-preloader.bin emmc-bl31-uboot.fip
+  ARTIFACTS := emmc-gpt.bin
   ARTIFACT/emmc-gpt.bin := mt798x-gpt emmc
 endef
 
@@ -638,7 +638,8 @@ define Device/cmcc_rax3000m
   DEVICE_MODEL := RAX3000M
   DEVICE_DTS := mt7981b-cmcc-rax3000m
   $(call Device/cmcc_rax3000m_common)
-  ARTIFACTS += nand-preloader.bin nand-bl31-uboot.fip
+  ARTIFACTS += emmc-preloader.bin emmc-bl31-uboot.fip \
+	nand-preloader.bin nand-bl31-uboot.fip
   ARTIFACT/emmc-preloader.bin := mt7981-bl2 emmc-ddr4
   ARTIFACT/emmc-bl31-uboot.fip := mt7981-bl31-uboot cmcc_rax3000m-emmc
   ARTIFACT/nand-preloader.bin := mt7981-bl2 spim-nand-ddr4
@@ -652,14 +653,18 @@ define Device/cmcc_rax3000me
   DEVICE_DTS := mt7981b-cmcc-rax3000me
   $(call Device/cmcc_rax3000m_common)
   DEVICE_DTS_OVERLAY += mt7981b-cmcc-rax3000me-nousb
-  ARTIFACTS += nand-ddr3-preloader.bin nand-ddr4-preloader.bin \
-	nand-usb-bl31-uboot.fip nand-nousb-bl31-uboot.fip
-  ARTIFACT/emmc-preloader.bin := mt7981-bl2 emmc-ddr3
-  ARTIFACT/emmc-bl31-uboot.fip := mt7981-bl31-uboot cmcc_rax3000me-emmc
+  ARTIFACTS += emmc-ddr3-preloader.bin emmc-ddr3-bl31-uboot.fip \
+	emmc-ddr4-preloader.bin emmc-ddr4-bl31-uboot.fip \
+	nand-ddr3-preloader.bin nand-ddr3-bl31-uboot.fip \
+	nand-ddr4-preloader.bin nand-ddr4-bl31-uboot.fip
+  ARTIFACT/emmc-ddr3-preloader.bin := mt7981-bl2 emmc-ddr3
+  ARTIFACT/emmc-ddr3-bl31-uboot.fip := mt7981-bl31-uboot cmcc_rax3000me-emmc-ddr3
+  ARTIFACT/emmc-ddr4-preloader.bin := mt7981-bl2 emmc-ddr4
+  ARTIFACT/emmc-ddr4-bl31-uboot.fip := mt7981-bl31-uboot cmcc_rax3000me-emmc-ddr4
   ARTIFACT/nand-ddr3-preloader.bin := mt7981-bl2 spim-nand-ddr3
+  ARTIFACT/nand-ddr3-bl31-uboot.fip := mt7981-bl31-uboot cmcc_rax3000me-nand-ddr3
   ARTIFACT/nand-ddr4-preloader.bin := mt7981-bl2 spim-nand-ddr4
-  ARTIFACT/nand-usb-bl31-uboot.fip := mt7981-bl31-uboot cmcc_rax3000me-nand-usb
-  ARTIFACT/nand-nousb-bl31-uboot.fip := mt7981-bl31-uboot cmcc_rax3000me-nand-nousb
+  ARTIFACT/nand-ddr4-bl31-uboot.fip := mt7981-bl31-uboot cmcc_rax3000me-nand-ddr4
 endef
 TARGET_DEVICES += cmcc_rax3000me
 
@@ -921,7 +926,10 @@ define Device/dlink_aquila-pro-ai-m30-a1
   IMAGES += recovery.bin
   IMAGE_SIZE := 51200k
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-  IMAGE/recovery.bin := sysupgrade-tar | pad-to $$(IMAGE_SIZE) | dlink-ai-recovery-header DLK6E6110001 \x6A\x28\xEE\x0B \x00\x00\x2C\x00 \x00\x00\x20\x03 \x61\x6E
+ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
+  IMAGE/recovery.bin := append-image-stage initramfs-kernel.bin | sysupgrade-tar kernel=$$$$@ |\
+    pad-to $$(IMAGE_SIZE) | dlink-ai-recovery-header DLK6E6110001 \x6A\x28\xEE\x0B \x00\x00\x2C\x00 \x00\x00\x20\x03 \x61\x6E
+endif
 endef
 TARGET_DEVICES += dlink_aquila-pro-ai-m30-a1
 
@@ -935,7 +943,10 @@ define Device/dlink_aquila-pro-ai-m60-a1
   IMAGES += recovery.bin
   IMAGE_SIZE := 51200k
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
-  IMAGE/recovery.bin := sysupgrade-tar | pad-to $$(IMAGE_SIZE) | dlink-ai-recovery-header DLK6E8202001 \x30\x6C\x19\x0C \x00\x00\x2C\x00 \x00\x00\x20\x03 \x82\x6E
+ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
+  IMAGE/recovery.bin := append-image-stage initramfs-kernel.bin | sysupgrade-tar kernel=$$$$@ |\
+    pad-to $$(IMAGE_SIZE) | dlink-ai-recovery-header DLK6E8202001 \x30\x6C\x19\x0C \x00\x00\x2C\x00 \x00\x00\x20\x03 \x82\x6E
+endif
 endef
 TARGET_DEVICES += dlink_aquila-pro-ai-m60-a1
 
@@ -1712,6 +1723,19 @@ define Device/openembed_som7981
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 endef
 TARGET_DEVICES += openembed_som7981
+
+define Device/openfi_6c
+  DEVICE_VENDOR := OpenFi
+  DEVICE_MODEL := 6C
+  DEVICE_DTS := mt7981b-openfi-6c
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware kmod-usb3 automount
+  KERNEL := kernel-bin | lzma | fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+        fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += openfi_6c
 
 define Device/openwrt_one
   DEVICE_VENDOR := OpenWrt
