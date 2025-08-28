@@ -159,6 +159,8 @@ function setup_sta(data, config) {
 		config.group = 'GCMP';
 	}
 
+	config.key_mgmt ??= 'NONE';
+
 	config.basic_rate = ratelist(config.basic_rate);
 	config.mcast_rate = ratestr(config.mcast_rate);
 
@@ -188,8 +190,10 @@ export function generate(config_list, data, interface) {
 
 	interface.config.country = data.config.country_code;
 	interface.config.beacon_int = data.config.beacon_int;
+	if (data.config.scan_list)
+		interface.config.scan_list = join(" ", data.config.scan_list);
 
-	append_vars(interface.config, [ 'country', 'beacon_int' ]);
+	append_vars(interface.config, [ 'country', 'beacon_int', 'scan_list' ]);
 
 	setup_sta(data.config, interface.config);
 
